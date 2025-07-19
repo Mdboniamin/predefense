@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Manage Users</h1>
+    
+    {% if users %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.phone_number }}</td>
+                            <td>{{ user.role.title() }}</td>
+                            <td>{{ user.status.title() }}</td>
+                            <td>
+                                {% if user.role == 'restaurant' and user.status == 'pending' %}
+                                    <form method="POST" action="{{ url_for('admin.approve_restaurant', user_id=user.id) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                    </form>
+                                {% endif %}
+                                
+                                {% if user.status != 'suspended' %}
+                                    <form method="POST" action="{{ url_for('admin.suspend_user', user_id=user.id) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Are you sure?')">Suspend</button>
+                                    </form>
+                                {% endif %}
+                                
+                                <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure? This action cannot be undone.')">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <h4>No users found!</h4>
+        </div>
+    {% endif %}
+    
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+{% endblock content %}
+

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Order History</h1>
+    
+    {% if orders %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Food Item</th>
+                        <th>Restaurant</th>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <th>Status</th>
+                        <th>Payment Status</th>
+                        <th>Order Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.food_item.name }}</td>
+                            <td>{{ order.restaurant_user.name }}</td>
+                            <td>{{ order.quantity }}</td>
+                            <td>${{ order.total_price }}</td>
+                            <td><span class="order-status {{ order.status }}">{{ order.status.title() }}</span></td>
+                            <td>
+                                {% if order.payment %}
+                                    <span class="payment-status {{ order.payment.payment_status }}">{{ order.payment.payment_status.title() }}</span>
+                                {% else %}
+                                    <span class="payment-status pending">No Payment</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <h4>No orders yet!</h4>
+            <p><a href="{{ url_for('customer.browse') }}">Browse food items</a> to place your first order.</p>
+        </div>
+    {% endif %}
+{% endblock content %}
+

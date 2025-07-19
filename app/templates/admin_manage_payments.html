@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Manage Payments</h1>
+    
+    {% if payments %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Restaurant</th>
+                        <th>Transaction ID</th>
+                        <th>Phone Number</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                        <tr>
+                            <td>{{ payment.id }}</td>
+                            <td>{{ payment.order_id }}</td>
+                            <td>{{ payment.customer_payer.name }}</td>
+                            <td>{{ payment.restaurant_receiver.name }}</td>
+                            <td>{{ payment.bkash_transaction_id }}</td>
+                            <td>{{ payment.payment_phone_number }}</td>
+                            <td>${{ payment.amount }}</td>
+                            <td><span class="payment-status {{ payment.payment_status }}">{{ payment.payment_status.title() }}</span></td>
+                            <td>
+                                {% if payment.payment_date %}
+                                    {{ payment.payment_date.strftime("%Y-%m-%d %H:%M") }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if payment.payment_status == "pending" %}
+                                    <form method="POST" action="{{ url_for("admin.verify_payment", payment_id=payment.id) }}" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-success">Verify</button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for("admin.reject_payment", payment_id=payment.id) }}" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm("Are you sure?")">Reject</button>
+                                    </form>
+                                {% else %}
+                                    <span class="text-muted">{{ payment.payment_status.title() }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <h4>No payments found!</h4>
+        </div>
+    {% endif %}
+    
+    <a href="{{ url_for("admin.dashboard") }}" class="btn btn-secondary">Back to Dashboard</a>
+{% endblock content %}
+

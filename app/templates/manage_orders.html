@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Manage Orders</h1>
+    
+    {% if orders %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Food Item</th>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <th>Status</th>
+                        <th>Payment Status</th>
+                        <th>Order Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.customer_user.name }}</td>
+                            <td>{{ order.food_item.name }}</td>
+                            <td>{{ order.quantity }}</td>
+                            <td>${{ order.total_price }}</td>
+                            <td><span class="order-status {{ order.status }}">{{ order.status.title() }}</span></td>
+                            <td>
+                                {% if order.payment %}
+                                    <span class="payment-status {{ order.payment.payment_status }}">{{ order.payment.payment_status.title() }}</span>
+                                    <br><small>TxID: {{ order.payment.bkash_transaction_id }}</small>
+                                {% else %}
+                                    <span class="payment-status pending">No Payment</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if order.status == 'pending' %}
+                                    <form method="POST" action="{{ url_for("restaurant.update_order_status", order_id=order.id, status="accepted") }}" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                                    </form>
+                                {% elif order.status == 'accepted' %}
+                                    <form method="POST" action="{{ url_for("restaurant.update_order_status", order_id=order.id, status="preparing") }}" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-warning">Start Preparing</button>
+                                    </form>
+                                {% elif order.status == 'preparing' %}
+                                    <form method="POST" action="{{ url_for("restaurant.update_order_status", order_id=order.id, status="ready") }}" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-info">Mark Ready</button>
+                                    </form>
+                                {% elif order.status == 'ready' %}
+                                    <form method="POST" action="{{ url_for("restaurant.update_order_status", order_id=order.id, status="delivered") }}" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-primary">Mark Delivered</button>
+                                    </form>
+                                {% endif %}
+                                
+                                {% if order.status not in ['delivered', 'cancelled'] %}                                    <form method="POST" action="{{ url_for("restaurant.update_order_status", order_id=order.id, status="cancelled") }}" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'Are you sure?\')">Cancel</button>
+                                    </form>                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <h4>No orders yet!</h4>
+            <p>Orders will appear here when customers place them.</p>
+        </div>
+    {% endif %}
+    
+    <a href="{{ url_for('restaurant.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+{% endblock content %}
+

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-6">
+            {% if food_item.image_url %}
+                <img class="img-fluid" src="{{ url_for('static', filename='uploads/' + food_item.image_url) }}" alt="{{ food_item.name }}">
+            {% else %}
+                <img class="img-fluid" src="https://via.placeholder.com/400x300?text=No+Image" alt="{{ food_item.name }}">
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <h1>{{ food_item.name }}</h1>
+            <p class="lead">{{ food_item.description or "No description available" }}</p>
+            <h3>Price: ${{ food_item.price }}</h3>
+            <p><strong>Restaurant:</strong> {{ food_item.restaurant_owner.name }}</p>
+            
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.quantity.label(class="form-control-label") }}
+                    {% if form.quantity.errors %}
+                        {{ form.quantity(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.quantity.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.quantity(class="form-control") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+            
+            <a href="{{ url_for('customer.browse') }}" class="btn btn-secondary">Back to Browse</a>
+        </div>
+    </div>
+{% endblock content %}
+

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>About Food Order App</h1>
+    <p>This is a multi-user role-based food ordering system with the following features:</p>
+    <ul>
+        <li><strong>Customer Features:</strong>
+            <ul>
+                <li>Browse food items from different restaurants</li>
+                <li>Add items to cart and place orders</li>
+                <li>Make payments via bKash</li>
+                <li>Track order history and status</li>
+                <li>Update profile information</li>
+            </ul>
+        </li>
+        <li><strong>Restaurant Features:</strong>
+            <ul>
+                <li>Manage food items (add, edit, delete)</li>
+                <li>View and manage orders</li>
+                <li>Update order status</li>
+                <li>View payment details</li>
+                <li>Update profile information</li>
+            </ul>
+        </li>
+        <li><strong>Admin Features:</strong>
+            <ul>
+                <li>Manage all users, food items, and orders</li>
+                <li>Approve restaurant accounts</li>
+                <li>Verify bKash payments</li>
+                <li>Full system oversight</li>
+            </ul>
+        </li>
+    </ul>
+    <p>The system uses manual bKash payment verification for secure transactions.</p>
+{% endblock content %}
+
