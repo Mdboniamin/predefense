@@ -1,18 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="jumbotron">
-        <h1 class="display-4">Welcome to Food Order App</h1>
-        <p class="lead">Order delicious food from your favorite restaurants!</p>
-        {% if not current_user.is_authenticated %}
-            <a class="btn btn-primary btn-lg" href="{{ url_for('auth.register') }}" role="button">Get Started</a>
-        {% endif %}
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to Food Order App</h1>
+            <p class="hero-subtitle">Order delicious food from your favorite restaurants!</p>
+            {% if not current_user.is_authenticated %}
+                <a class="btn btn-primary btn-lg hero-btn" href="{{ url_for('auth.register') }}" role="button">
+                    <i class="fas fa-rocket"></i> Get Started
+                </a>
+            {% endif %}
+        </div>
     </div>
 
-    <h2>Featured Food Items</h2>
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-star"></i> Featured Food Items
+        </h2>
+        <p class="section-subtitle">Discover our most popular dishes</p>
+    </div>
+    
     <div class="row">
         {% for food_item in food_items %}
-            <div class="col-md-4 food-item-card">
-                <div class="card">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card food-item-card">
                     {% if food_item.image_url %}
                         <img class="card-img-top food-item-img" src="{{ url_for('static', filename='uploads/' + food_item.image_url) }}" alt="{{ food_item.name }}">
                     {% else %}
@@ -21,10 +31,14 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ food_item.name }}</h5>
                         <p class="card-text">{{ food_item.description or "No description available" }}</p>
-                        <p class="card-text"><strong>Price: ${{ food_item.price }}</strong></p>
-                        <p class="card-text"><small class="text-muted">By: {{ food_item.restaurant_owner.name }}</small></p>
+                        <div class="price-section">
+                            <span class="price">${{ food_item.price }}</span>
+                            <span class="restaurant-name">{{ food_item.restaurant_owner.name }}</span>
+                        </div>
                         {% if current_user.is_authenticated and current_user.role == "customer" %}
-                            <a href="{{ url_for('customer.add_to_cart', food_item_id=food_item.id) }}" class="btn btn-primary">Add to Cart</a>
+                            <a href="{{ url_for('customer.add_to_cart', food_item_id=food_item.id) }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </a>
                         {% endif %}
                     </div>
                 </div>
@@ -33,9 +47,12 @@
     </div>
 
     {% if not food_items %}
-        <div class="alert alert-info">
-            <h4>No food items available yet!</h4>
-            <p>Check back later for delicious food options.</p>
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-utensils"></i>
+            </div>
+            <h4 class="empty-state-title">No food items available yet!</h4>
+            <p class="empty-state-text">Check back later for delicious food options.</p>
         </div>
     {% endif %}
 {% endblock content %}

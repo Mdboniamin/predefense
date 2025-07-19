@@ -1,67 +1,214 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="content-section">
-        <form method="POST" action="">
-            {{ form.hidden_tag() }}
-            <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Update Profile</legend>
-                <div class="form-group">
-                    {{ form.name.label(class="form-control-label") }}
-                    {% if form.name.errors %}
-                        {{ form.name(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.name.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.name(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.email.label(class="form-control-label") }}
-                    {% if form.email.errors %}
-                        {{ form.email(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.email.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.email(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.phone_number.label(class="form-control-label") }}
-                    {% if form.phone_number.errors %}
-                        {{ form.phone_number(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.phone_number.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.phone_number(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.location.label(class="form-control-label") }}
-                    {% if form.location.errors %}
-                        {{ form.location(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.location.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.location(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-            </fieldset>
-            <div class="form-group">
-                {{ form.submit(class="btn btn-outline-info") }}
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <i class="fas fa-user-circle"></i>
             </div>
-        </form>
+            <div class="profile-info">
+                <h2 class="profile-name">{{ current_user.name }}</h2>
+                <p class="profile-role">
+                    <i class="fas fa-tag"></i>
+                    {{ current_user.role.title() }} Account
+                </p>
+                <p class="profile-email">
+                    <i class="fas fa-envelope"></i>
+                    {{ current_user.email }}
+                </p>
+            </div>
+        </div>
+
+        <div class="profile-stats">
+            {% if current_user.role == "customer" %}
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Orders</h3>
+                        <p>{{ current_user.orders_as_customer|length }}</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Favorite Items</h3>
+                        <p>{{ current_user.orders_as_customer|length * 2 }}</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Loyalty Points</h3>
+                        <p>{{ current_user.orders_as_customer|length * 10 }}</p>
+                    </div>
+                </div>
+            {% elif current_user.role == "restaurant" %}
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Menu Items</h3>
+                        <p>{{ current_user.food_items|length }}</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Orders</h3>
+                        <p>{{ current_user.orders_as_restaurant|length }}</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Revenue</h3>
+                        <p>${{ "%.2f"|format(current_user.orders_as_restaurant|sum(attribute='total_price') or 0) }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="profile-form-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-edit"></i>
+                    Update Profile Information
+                </h3>
+                <p class="section-subtitle">Keep your information up to date</p>
+            </div>
+
+            <form method="POST" action="" class="profile-form">
+                {{ form.hidden_tag() }}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form.name.label(class="form-label") }}
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            {% if form.name.errors %}
+                                {{ form.name(class="form-control is-invalid", placeholder="Enter your full name") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.name.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.name(class="form-control", placeholder="Enter your full name") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.email.label(class="form-label") }}
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            {% if form.email.errors %}
+                                {{ form.email(class="form-control is-invalid", placeholder="Enter your email address") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.email(class="form-control", placeholder="Enter your email address") }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form.phone_number.label(class="form-label") }}
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            {% if form.phone_number.errors %}
+                                {{ form.phone_number(class="form-control is-invalid", placeholder="Enter your phone number") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.phone_number.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.phone_number(class="form-control", placeholder="Enter your phone number") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.location.label(class="form-label") }}
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            {% if form.location.errors %}
+                                {{ form.location(class="form-control is-invalid", placeholder="Enter your location") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.location.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.location(class="form-control", placeholder="Enter your location") }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    {{ form.submit(class="btn btn-primary profile-btn") }}
+                    <a href="{{ url_for('main.home') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+
+        {% if current_user.role == "customer" %}
+            <div class="recent-activity">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-clock"></i>
+                        Recent Activity
+                    </h3>
+                </div>
+                <div class="activity-list">
+                    {% for order in current_user.orders_as_customer[:5] %}
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>Order #{{ order.id }}</h4>
+                                <p>{{ order.food_item.name }} - ${{ order.total_price }}</p>
+                                <span class="activity-time">{{ order.order_date.strftime('%B %d, %Y') }}</span>
+                            </div>
+                            <div class="activity-status status-{{ order.status }}">
+                                {{ order.status.title() }}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="empty-activity">
+                            <i class="fas fa-inbox"></i>
+                            <p>No recent activity</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
     </div>
 {% endblock content %}
 

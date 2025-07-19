@@ -2,7 +2,9 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from app import db
 from app.models.food_item import FoodItem
 from app.models.order import Order
+from app.models.payment import Payment
 from app.utils.food_item_forms import FoodItemForm
+from app.utils.profile_forms import UpdateProfileForm
 from app.utils.decorators import restaurant_required
 from flask_login import login_required, current_user
 import os
@@ -123,6 +125,27 @@ def update_order_status(order_id, status):
         flash(f"Order status updated to {status}!", "success")
     else:
         flash("Invalid status!", "danger")
+    
+    return redirect(url_for("restaurant.manage_orders"))
+
+@restaurant.route("/verify_payment/<int:payment_id>", methods=["POST"])
+@login_required
+@restaurant_required
+def verify_payment(payment_id):
+    payment = Payment.query.get_or_404(payment_id)
+    
+    # Check if the payment belongs to an order from this restaurant
+    if payment.restaurant_id != current_user.id:
+        flash("You can only verify payments for your own orders.", "danger")
+        return redirect(url_for("restaurant.manage_orders"))
+    
+    # Update payment status to verified
+    if payment.payment_status == 'pending':
+        payment.payment_status = 'verified'
+        db.session.commit()
+        flash(f"Payment for Order #{payment.order_id} has been verified!", "success")
+    else:
+        flash("Payment is already verified or has a different status.", "warning")
     
     return redirect(url_for("restaurant.manage_orders"))
 

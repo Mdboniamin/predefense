@@ -5,6 +5,7 @@ from app.models.order import Order
 from app.models.payment import Payment
 from app.models.user import User
 from app.utils.order_forms import OrderForm
+from app.utils.profile_forms import UpdateProfileForm
 from app.utils.decorators import customer_required
 from flask_login import login_required, current_user
 from decimal import Decimal

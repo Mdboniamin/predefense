@@ -31,6 +31,16 @@
                                 {% if order.payment %}
                                     <span class="payment-status {{ order.payment.payment_status }}">{{ order.payment.payment_status.title() }}</span>
                                     <br><small>TxID: {{ order.payment.bkash_transaction_id }}</small>
+                                    <br><small>Phone: {{ order.payment.payment_phone_number }}</small>
+                                    {% if order.payment.payment_status == 'pending' %}
+                                        <br>
+                                        <form method="POST" action="{{ url_for('restaurant.verify_payment', payment_id=order.payment.id) }}" style="display: inline; margin-top: 5px;">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-xs btn-success" onclick="return confirm('Verify this payment?')">
+                                                <i class="fas fa-check"></i> Verify Payment
+                                            </button>
+                                        </form>
+                                    {% endif %}
                                 {% else %}
                                     <span class="payment-status pending">No Payment</span>
                                 {% endif %}
