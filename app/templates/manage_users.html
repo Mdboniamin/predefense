@@ -28,17 +28,25 @@
                             <td>
                                 {% if user.role == 'restaurant' and user.status == 'pending' %}
                                     <form method="POST" action="{{ url_for('admin.approve_restaurant', user_id=user.id) }}" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <button type="submit" class="btn btn-sm btn-success">Approve</button>
                                     </form>
                                 {% endif %}
                                 
                                 {% if user.status != 'suspended' %}
                                     <form method="POST" action="{{ url_for('admin.suspend_user', user_id=user.id) }}" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Are you sure?')">Suspend</button>
+                                    </form>
+                                {% else %}
+                                    <form method="POST" action="{{ url_for('admin.activate_user', user_id=user.id) }}" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Are you sure?')">Activate</button>
                                     </form>
                                 {% endif %}
                                 
                                 <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure? This action cannot be undone.')">Delete</button>
                                 </form>
                             </td>
@@ -55,4 +63,3 @@
     
     <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
 {% endblock content %}
-

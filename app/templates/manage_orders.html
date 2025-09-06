@@ -1,78 +1,34 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Manage Orders</h1>
+    <h1>Manage Food Items</h1>
     
-    {% if orders %}
+    {% if food_items %}
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Food Item</th>
-                        <th>Quantity</th>
-                        <th>Total Price</th>
-                        <th>Status</th>
-                        <th>Payment Status</th>
-                        <th>Order Date</th>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Restaurant</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for order in orders %}
+                    {% for food_item in food_items %}
                         <tr>
-                            <td>{{ order.id }}</td>
-                            <td>{{ order.customer_user.name }}</td>
-                            <td>{{ order.food_item.name }}</td>
-                            <td>{{ order.quantity }}</td>
-                            <td>${{ order.total_price }}</td>
-                            <td><span class="order-status {{ order.status }}">{{ order.status.title() }}</span></td>
+                            <td>{{ food_item.id }}</td>
+                            <td>{{ food_item.name }}</td>
+                            <td>{{ food_item.description or "No description" }}</td>
+                            <td>${{ food_item.price }}</td>
+                            <td>{{ food_item.restaurant_owner.name }}</td>
                             <td>
-                                {% if order.payment %}
-                                    <span class="payment-status {{ order.payment.payment_status }}">{{ order.payment.payment_status.title() }}</span>
-                                    <br><small>TxID: {{ order.payment.bkash_transaction_id }}</small>
-                                    <br><small>Phone: {{ order.payment.payment_phone_number }}</small>
-                                    {% if order.payment.payment_status == 'pending' %}
-                                        <br>
-                                        <form method="POST" action="{{ url_for('restaurant.verify_payment', payment_id=order.payment.id) }}" style="display: inline; margin-top: 5px;">
-                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                            <button type="submit" class="btn btn-xs btn-success" onclick="return confirm('Verify this payment?')">
-                                                <i class="fas fa-check"></i> Verify Payment
-                                            </button>
-                                        </form>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="payment-status pending">No Payment</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                            <td>
-                                {% if order.status == 'pending' %}
-                                    <form method="POST" action="{{ url_for("restaurant.update_order_status", order_id=order.id, status="accepted") }}" style="display: inline;">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-sm btn-success">Accept</button>
-                                    </form>
-                                {% elif order.status == 'accepted' %}
-                                    <form method="POST" action="{{ url_for("restaurant.update_order_status", order_id=order.id, status="preparing") }}" style="display: inline;">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-sm btn-warning">Start Preparing</button>
-                                    </form>
-                                {% elif order.status == 'preparing' %}
-                                    <form method="POST" action="{{ url_for("restaurant.update_order_status", order_id=order.id, status="ready") }}" style="display: inline;">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-sm btn-info">Mark Ready</button>
-                                    </form>
-                                {% elif order.status == 'ready' %}
-                                    <form method="POST" action="{{ url_for("restaurant.update_order_status", order_id=order.id, status="delivered") }}" style="display: inline;">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-sm btn-primary">Mark Delivered</button>
-                                    </form>
-                                {% endif %}
-                                
-                                {% if order.status not in ['delivered', 'cancelled'] %}                                    <form method="POST" action="{{ url_for("restaurant.update_order_status", order_id=order.id, status="cancelled") }}" style="display: inline;">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'Are you sure?\')">Cancel</button>
-                                    </form>                                {% endif %}
+                                <a href="{{ url_for('admin.edit_food_item', food_item_id=food_item.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                <form method="POST" action="{{ url_for('admin.delete_food_item', food_item_id=food_item.id) }}" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure? This will also delete related orders and payments.')">Delete</button>
+                                </form>
                             </td>
                         </tr>
                     {% endfor %}
@@ -81,11 +37,9 @@
         </div>
     {% else %}
         <div class="alert alert-info">
-            <h4>No orders yet!</h4>
-            <p>Orders will appear here when customers place them.</p>
+            <h4>No food items found!</h4>
         </div>
     {% endif %}
     
-    <a href="{{ url_for('restaurant.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
 {% endblock content %}
-

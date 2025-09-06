@@ -146,10 +146,30 @@ def verify_payment(payment_id):
         flash(f"Payment for Order #{payment.order_id} has been verified!", "success")
     else:
         flash("Payment is already verified or has a different status.", "warning")
+        return redirect(url_for("restaurant.manage_orders"))
+
+@restaurant.route("/update_payment_status/<int:payment_id>", methods=["POST"])
+@login_required
+@restaurant_required
+def update_payment_status(payment_id):
+    payment = Payment.query.get_or_404(payment_id)
+    
+    # Check if the payment belongs to an order from this restaurant
+    if payment.restaurant_id != current_user.id:
+        flash("You can only update payments for your own orders.", "danger")
+        return redirect(url_for("restaurant.manage_orders"))
+    
+    new_status = request.form.get("new_status")
+    valid_payment_statuses = ["verified", "failed"]
+
+    if new_status in valid_payment_statuses:
+        payment.payment_status = new_status
+        db.session.commit()
+        flash(f"Payment status for Order #{payment.order_id} updated to {new_status}!", "success")
+    else:
+        flash("Invalid payment status!", "danger")
     
     return redirect(url_for("restaurant.manage_orders"))
-
-
 
 @restaurant.route("/profile", methods=["GET", "POST"])
 @login_required

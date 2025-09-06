@@ -1,129 +1,92 @@
-# Food Order App
+# Food Order App - Local Setup Guide
 
-A multi-user role-based CRUD food ordering system with payment tracking using Flask, SQLAlchemy, and bKash payment integration.
+This guide provides instructions to set up and run the Food Order App on your local machine. Follow these steps carefully to get the application up and running.
 
-## Features
+## 1. Prerequisites
 
-### Customer Features
-- Browse food items from different restaurants
-- Add items to cart and place orders
-- Make payments via bKash (manual verification)
-- Track order history and status
-- Update profile information
+Before you begin, ensure you have the following installed on your system:
 
-### Restaurant Features
-- Manage food items (add, edit, delete)
-- View and manage orders
-- Update order status (pending → accepted → preparing → ready → delivered)
-- View payment details
-- Update profile information
+- **Python 3.8+**: The application is developed using Python. You can download it from [python.org](https://www.python.org/downloads/).
+- **pip**: Python's package installer. It usually comes with Python.
+- **Git**: For cloning the repository. Download from [git-scm.com](https://git-scm.com/downloads).
 
-### Admin Features
-- Manage all users, food items, and orders
-- Approve restaurant accounts
-- Verify bKash payments
-- Full system oversight
+## 2. Setup Instructions
 
-## Technology Stack
+### Step 2.1: Clone the Repository
 
-- **Backend**: Flask (Python)
-- **Database**: SQLite (development) / MySQL (production)
-- **Frontend**: HTML, CSS (Bootstrap), JavaScript
-- **Authentication**: Flask-Login with bcrypt password hashing
-- **Payment**: Manual bKash payment with transaction ID verification
-- **Security**: CSRF protection, input validation
+First, clone the application repository to your local machine using Git:
 
-## Installation
-
-1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd food_order_app
+git clone https://github.com/Mdboniamin/predefense.git
+cd predefense
 ```
 
-2. Install dependencies:
+### Step 2.2: Create a Virtual Environment
+
+It's highly recommended to use a virtual environment to manage project dependencies. This prevents conflicts with other Python projects.
+
+```bash
+python3 -m venv venv
+```
+
+### Step 2.3: Activate the Virtual Environment
+
+- **On Windows:**
+
+  ```bash
+  .\venv\Scripts\activate
+  ```
+
+- **On macOS/Linux:**
+
+  ```bash
+  source venv/bin/activate
+  ```
+
+### Step 2.4: Install Dependencies
+
+Once the virtual environment is activated, install the required Python packages using pip:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Set environment variables (optional):
+### Step 2.5: Database Setup
+
+The application uses SQLite as its database. You need to initialize the database and seed it with some dummy data.
+
 ```bash
-export SECRET_KEY="your-secret-key"
-export DATABASE_URL="your-database-url"
+python run.py db_init
+python seed_data.py
 ```
 
-4. Initialize the database:
+### Step 2.6: Run the Application
+
+After setting up the database, you can run the Flask application:
+
 ```bash
 python run.py
 ```
 
-5. Access the application at `http://localhost:5000`
+This will start the development server, and the application will be accessible at `http://127.0.0.1:5000` in your web browser.
 
-## Demo Users
+## 3. Demo Credentials
 
-The application comes with pre-seeded demo users:
+Use the following credentials to log in and test the application:
 
-### Admin
-- **Email**: admin@foodapp.com
-- **Password**: admin123
+- **Admin:** admin@foodapp.com / admin123
+- **Restaurant:** restaurant@foodapp.com / restaurant123  
+- **Customer:** customer@foodapp.com / customer123
 
-### Restaurant
-- **Email**: restaurant@foodapp.com
-- **Password**: restaurant123
+## 4. Troubleshooting
 
-### Customer
-- **Email**: customer@foodapp.com
-- **Password**: customer123
+- **`ModuleNotFoundError`**: Ensure you have activated your virtual environment and installed all dependencies using `pip install -r requirements.txt`.
+- **Database errors**: If you encounter issues with the database, try deleting `instance/site.db` (if it exists) and re-running `python run.py db_init` and `python seed_data.py`.
+- **Port already in use**: If port 5000 is already in use, you might see an error. You can try running the app on a different port by modifying `run.py` or finding and terminating the process using port 5000.
 
-## Usage
+---
 
-1. **Registration**: Users can register as Customer or Restaurant
-2. **Restaurant Approval**: Restaurant accounts need admin approval
-3. **Food Management**: Restaurants can add/edit their food items
-4. **Ordering**: Customers browse and add items to cart
-5. **Payment**: Manual bKash payment with transaction ID
-6. **Order Tracking**: Real-time order status updates
+**Author:** Manus AI
+**Date:** 7/19/2025
 
-## Database Schema
-
-### Users Table
-- id, name, email, phone_number, location, password, role, status
-
-### Food Items Table
-- id, name, description, price, image_url, restaurant_id, created_at
-
-### Orders Table
-- id, customer_id, food_item_id, restaurant_id, quantity, total_price, status, payment_id, order_date
-
-### Payments Table
-- id, order_id, customer_id, restaurant_id, bkash_transaction_id, payment_phone_number, payment_method, amount, payment_status, payment_date
-
-## Security Features
-
-- Password hashing with bcrypt
-- CSRF protection on all forms
-- Role-based access control
-- Input validation and sanitization
-- Session management
-
-## Testing
-
-Run the test suite:
-```bash
-python -m unittest discover tests
-```
-
-## Deployment
-
-For production deployment:
-
-1. Set up a MySQL database
-2. Update the DATABASE_URL environment variable
-3. Set a secure SECRET_KEY
-4. Use a production WSGI server like Gunicorn
-5. Configure a reverse proxy (Nginx)
-
-## License
-
-This project is licensed under the MIT License.
 

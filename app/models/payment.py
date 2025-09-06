@@ -11,7 +11,7 @@ class Payment(db.Model):
     payment_phone_number = db.Column(db.String(20), nullable=False)
     payment_method = db.Column(db.Enum('bkash', name='payment_methods'), default='bkash')
     amount = db.Column(db.Numeric(10, 2), nullable=False)
-    payment_status = db.Column(db.Enum('pending', 'verified', 'failed', name='payment_status'), default='pending')
+    payment_status = db.Column(db.Enum('pending', 'verified','rejected' ,'failed', name='payment_status'), default='pending' )
     payment_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
