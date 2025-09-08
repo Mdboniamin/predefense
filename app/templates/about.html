@@ -1,35 +1,75 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>About Food Order App</h1>
-    <p>This is a multi-user role-based food ordering system with the following features:</p>
-    <ul>
-        <li><strong>Customer Features:</strong>
-            <ul>
-                <li>Browse food items from different restaurants</li>
-                <li>Add items to cart and place orders</li>
-                <li>Make payments via bKash</li>
-                <li>Track order history and status</li>
-                <li>Update profile information</li>
-            </ul>
-        </li>
-        <li><strong>Restaurant Features:</strong>
-            <ul>
-                <li>Manage food items (add, edit, delete)</li>
-                <li>View and manage orders</li>
-                <li>Update order status</li>
-                <li>View payment details</li>
-                <li>Update profile information</li>
-            </ul>
-        </li>
-        <li><strong>Admin Features:</strong>
-            <ul>
-                <li>Manage all users, food items, and orders</li>
-                <li>Approve restaurant accounts</li>
-                <li>Verify bKash payments</li>
-                <li>Full system oversight</li>
-            </ul>
-        </li>
-    </ul>
-    <p>The system uses manual bKash payment verification for secure transactions.</p>
-{% endblock content %}
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">About Food Order App</h1>
+            <p class="hero-subtitle">Discover a seamless food ordering experience connecting customers, restaurants, and admins with secure transactions.</p>
+        </div>
+    </div>
 
+    <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-utensils"></i> Our Features</h2>
+        <p class="section-subtitle">Explore how our platform empowers every user role</p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-user"></i> Customer Features</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check-circle"></i> Browse food items from various restaurants</li>
+                        <li><i class="fas fa-check-circle"></i> Add items to cart and place orders</li>
+                        <li><i class="fas fa-check-circle"></i> Secure payments via bKash</li>
+                        <li><i class="fas fa-check-circle"></i> Track order history and status</li>
+                        <li><i class="fas fa-check-circle"></i> Update profile information</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-store"></i> Restaurant Features</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check-circle"></i> Manage food items (add, edit, delete)</li>
+                        <li><i class="fas fa-check-circle"></i> View and manage incoming orders</li>
+                        <li><i class="fas fa-check-circle"></i> Update order status</li>
+                        <li><i class="fas fa-check-circle"></i> View payment details</li>
+                        <li><i class="fas fa-check-circle"></i> Update restaurant profile</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-user-shield"></i> Admin Features</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check-circle"></i> Manage all users, food items, and orders</li>
+                        <li><i class="fas fa-check-circle"></i> Approve restaurant accounts</li>
+                        <li><i class="fas fa-check-circle"></i> Verify bKash payments</li>
+                        <li><i class="fas fa-check-circle"></i> Full system oversight</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-shield-alt"></i> Secure Transactions</h2>
+        <p class="section-subtitle">Our system uses manual bKash payment verification to ensure safe and reliable transactions.</p>
+    </div>
+
+    <div class="text-center mb-4">
+        {% if not current_user.is_authenticated %}
+            <a class="btn btn-primary btn-lg hero-btn" href="{{ url_for('auth.register') }}" role="button">
+                <i class="fas fa-rocket"></i> Get Started Now
+            </a>
+        {% else %}
+            <a class="btn btn-primary btn-lg hero-btn" href="{{ url_for('main.home') }}" role="button">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        {% endif %}
+    </div>
+{% endblock content %}
