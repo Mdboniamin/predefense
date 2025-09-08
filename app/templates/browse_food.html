@@ -1,32 +1,292 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Browse Food Items</h1>
-    <div class="row">
-        {% for food_item in food_items %}
-            <div class="col-md-4 food-item-card">
-                <div class="card">
-                    {% if food_item.image_url %}
-                        <img class="card-img-top food-item-img" src="{{ url_for('static', filename='uploads/' + food_item.image_url) }}" alt="{{ food_item.name }}">
-                    {% else %}
-                        <img class="card-img-top food-item-img" src="https://via.placeholder.com/300x200?text=No+Image" alt="{{ food_item.name }}">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ food_item.name }}</h5>
-                        <p class="card-text">{{ food_item.description or "No description available" }}</p>
-                        <p class="card-text"><strong>Price: ${{ food_item.price }}</strong></p>
-                        <p class="card-text"><small class="text-muted">By: {{ food_item.restaurant_owner.name }}</small></p>
-                        <a href="{{ url_for('customer.add_to_cart', food_item_id=food_item.id) }}" class="btn btn-primary">Add to Cart</a>
+    <div class="container my-4">
+        <h1 class="mb-4">Browse Food Items</h1>
+        
+        <!-- Search and Filter Section -->
+        <div class="card mb-4 shadow-sm border-0 rounded-4 bg-light">
+            <div class="card-body py-4 px-4">
+                <h4 class="card-title mb-3 fw-semibold text-primary">
+                    <i class="fas fa-filter me-2"></i>Search & Filter
+                </h4>
+                <form class="row g-3 align-items-center">
+                    <!-- Search Bar -->
+                    <div class="col-md-4">
+                        <label for="searchInput" class="form-label fw-semibold">Search</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-secondary"></i>
+                            </span>
+                            <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Name or description..." aria-label="Search food items" autocomplete="off">
+                        </div>
+                    </div>
+                    <!-- Price Filter -->
+                    <div class="col-md-3">
+                        <label for="minPrice" class="form-label fw-semibold">Price Range ($)</label>
+                        <div class="input-group">
+                            <input type="number" id="minPrice" class="form-control" placeholder="Min" min="0" step="0.01" aria-label="Minimum price">
+                            <span class="input-group-text">–</span>
+                            <input type="number" id="maxPrice" class="form-control" placeholder="Max" min="0" step="0.01" aria-label="Maximum price">
+                        </div>
+                    </div>
+                    <!-- Restaurant Filter -->
+                    <div class="col-md-3">
+                        <label for="restaurantFilter" class="form-label fw-semibold">Restaurant</label>
+                        <div class="input-group flex-nowrap">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-store text-secondary"></i>
+                            </span>
+                            <select id="restaurantFilter" class="form-select border-start-0" aria-label="Filter by restaurant" style="min-width: 0;">
+                                <option value="">All Restaurants</option>
+                                {% set restaurants = [] %}
+                                {% for food_item in food_items %}
+                                    {% if food_item.restaurant_owner.name not in restaurants %}
+                                        {% set _ = restaurants.append(food_item.restaurant_owner.name) %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% for restaurant in restaurants %}
+                                    <option value="{{ restaurant }}">{{ restaurant }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Reset Button -->
+                    <div class="col-md-2 d-flex align-items-center">
+                        <button id="resetFilters" type="button" class="btn btn-outline-primary w-100 rounded-3 fw-semibold py-2">
+                            <i class="fas fa-undo-alt me-1"></i>Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Food Items Grid -->
+        <div class="row" id="foodItemsGrid">
+            {% for food_item in food_items %}
+                <div class="food-item-card" 
+                     data-name="{{ food_item.name.lower() }}" 
+                     data-description="{{ food_item.description.lower() if food_item.description else '' }}"
+                     data-price="{{ food_item.price }}"
+                     data-restaurant="{{ food_item.restaurant_owner.name }}"
+                     data-search-score="0">
+                    <div class="card h-100 shadow-sm">
+                        {% if food_item.image_url %}
+                            <img class="card-img-top food-item-img" src="{{ url_for('static', filename='uploads/' + food_item.image_url) }}" alt="{{ food_item.name }}">
+                        {% else %}
+                            <img class="card-img-top food-item-img" src="https://via.placeholder.com/300x200?text=No+Image" alt="{{ food_item.name }}">
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ food_item.name }}</h5>
+                            <p class="card-text">{{ food_item.description or "No description available" }}</p>
+                            <p class="card-text"><strong>Price: ${{ "%.2f"|format(food_item.price) }}</strong></p>
+                            <p class="card-text mt-auto"><small class="text-muted">By: {{ food_item.restaurant_owner.name }}</small></p>
+                            <a href="{{ url_for('customer.add_to_cart', food_item_id=food_item.id) }}" class="btn btn-primary btn-block mt-2">Add to Cart</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
+
+        <!-- No Results Message -->
+        <div class="alert alert-info d-none" id="noResults">
+            <h4>No food items found!</h4>
+            <p>Try adjusting your search or filters.</p>
+        </div>
     </div>
 
-    {% if not food_items %}
-        <div class="alert alert-info">
-            <h4>No food items available yet!</h4>
-            <p>Check back later for delicious food options.</p>
-        </div>
-    {% endif %}
-{% endblock content %}
+    <style>
+        /* Fix input-group alignment for select */
+        #restaurantFilter {
+            min-width: 0;
+            width: 100%;
+        }
+        .input-group .form-select {
+            flex: 1 1 auto;
+        }
+        /* Ensure consistent height and alignment */
+        .input-group, .form-control, .form-select, .btn-outline-primary {
+            min-height: 38px; /* Matches Bootstrap input height */
+        }
+        .card.bg-light {
+            background: linear-gradient(135deg, #f8fafc 80%, #e3eafc 100%);
+        }
+        .card-title {
+            letter-spacing: 0.5px;
+        }
+        .form-label {
+            font-size: 1rem;
+            color: #495057;
+        }
+        .input-group-text {
+            background: #fff;
+            border-radius: 5px 0 0 5px;
+            border-right: 0;
+        }
+        .form-control, .form-select {
+            border-radius: 0 5px 5px 0;
+            box-shadow: none;
+            border-color: #d1d5db;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.15rem rgba(13,110,253,.15);
+        }
+        .btn-outline-primary {
+            border-radius: 5px;
+            border-width: 2px;
+            font-weight: 500;
+        }
+        .btn-outline-primary:hover {
+            background: #0d6efd;
+            color: #fff;
+            border-color: #0d6efd;
+        }
+        /* Ensure all food item cards are the same height and aligned */
+        #foodItemsGrid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+        .food-item-card {
+            flex: 1 1 30%;
+            max-width: 32%;
+            min-width: 300px;
+            display: flex;
+            align-items: stretch;
+        }
+        .food-item-card .card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 420px;
+        }
+        .food-item-img {
+            object-fit: cover;
+            height: 200px;
+            width: 100%;
+        }
+        @media (max-width: 991px) {
+            .food-item-card {
+                flex: 1 1 45%;
+                max-width: 48%;
+            }
+        }
+        @media (max-width: 767px) {
+            #foodItemsGrid {
+                gap: 16px;
+            }
+            .food-item-card {
+                flex: 1 1 100%;
+                max-width: 100%;
+                min-width: 0;
+            }
+        }
+    </style>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const minPrice = document.getElementById('minPrice');
+            const maxPrice = document.getElementById('maxPrice');
+            const restaurantFilter = document.getElementById('restaurantFilter');
+            const resetFilters = document.getElementById('resetFilters');
+            const foodItems = document.querySelectorAll('.food-item-card');
+            const noResults = document.getElementById('noResults');
+
+            // Calculate max price dynamically
+            let prices = Array.from(foodItems).map(item => parseFloat(item.dataset.price));
+            let maxPriceDefault = Math.ceil(Math.max(...prices, 0) || 100); // Fallback to 100 if no items
+            minPrice.value = '';
+            maxPrice.value = '';
+
+            // Debounce function to limit filter calls
+            function debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            // Fuzzy search scoring function
+            function calculateSearchScore(text, query) {
+                if (!query) return 1; // No query, full score
+                const textLower = text.toLowerCase();
+                const queryLower = query.toLowerCase();
+                if (textLower.includes(queryLower)) return 1; // Exact substring match
+                let score = 0;
+                for (let i = 0; i < queryLower.length; i++) {
+                    if (textLower.includes(queryLower[i])) score += 0.1;
+                }
+                return score; // Partial character matches
+            }
+
+            // Filter items
+            function filterItems() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const minPriceFilter = parseFloat(minPrice.value) || 0;
+                const maxPriceFilter = parseFloat(maxPrice.value) || maxPriceDefault;
+                const restaurant = restaurantFilter.value;
+
+                let visibleItems = 0;
+                const itemsWithScores = Array.from(foodItems).map(item => {
+                    const name = item.dataset.name;
+                    const description = item.dataset.description;
+                    const price = parseFloat(item.dataset.price);
+                    const restaurantName = item.dataset.restaurant;
+
+                    // Calculate search score (name prioritized over description)
+                    const nameScore = calculateSearchScore(name, searchTerm);
+                    const descScore = calculateSearchScore(description, searchTerm);
+                    const searchScore = Math.max(nameScore, descScore * 0.5); // Name matches weigh more
+
+                    return { item, searchScore, price, restaurantName };
+                });
+
+                // Sort by search score (descending) if search term exists
+                if (searchTerm) {
+                    itemsWithScores.sort((a, b) => b.searchScore - a.searchScore);
+                }
+
+                itemsWithScores.forEach(({ item, searchScore, price, restaurantName }) => {
+                    const matchesSearch = searchScore > 0;
+                    const matchesPrice = price >= minPriceFilter && price <= maxPriceFilter;
+                    const matchesRestaurant = !restaurant || restaurantName === restaurant;
+
+                    if (matchesSearch && matchesPrice && matchesRestaurant) {
+                        item.classList.remove('d-none');
+                        item.dataset.searchScore = searchScore; // Store for debugging
+                        visibleItems++;
+                    } else {
+                        item.classList.add('d-none');
+                    }
+                });
+
+                // Show/hide no results message
+                noResults.classList.toggle('d-none', visibleItems > 0);
+            }
+
+            // Debounced filter function
+            const debouncedFilter = debounce(filterItems, 300);
+
+            // Event listeners
+            minPrice.addEventListener('input', debouncedFilter);
+            maxPrice.addEventListener('input', debouncedFilter);
+            searchInput.addEventListener('input', debouncedFilter);
+            restaurantFilter.addEventListener('change', debouncedFilter);
+
+            // Reset filters
+            resetFilters.addEventListener('click', function() {
+                searchInput.value = '';
+                minPrice.value = '';
+                maxPrice.value = '';
+                restaurantFilter.value = '';
+                filterItems(); // Immediate filter to show all items
+            });
+        });
+    </script>
+{% endblock content %}
