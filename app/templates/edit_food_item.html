@@ -67,8 +67,7 @@
     </div>
     <div class="border-top pt-3">
         <small class="text-muted">
-            <a href="{{ url_for('restaurant.dashboard') }}">Back to Dashboard</a>
+            <a href="{{ url_for(current_user.role + '.dashboard') }}">Back to Dashboard</a>
         </small>
     </div>
 {% endblock content %}
-
