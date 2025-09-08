@@ -1,3 +1,4 @@
+import bcrypt
 from flask import session
 from flask import Blueprint, render_template, url_for, flash, redirect, request
 from flask_login import login_required, current_user
@@ -304,6 +305,8 @@ def profile():
         current_user.email = form.email.data
         current_user.phone_number = form.phone_number.data
         current_user.location = form.location.data
+        if form.password.data:
+            current_user.password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')        
         db.session.commit()
         flash("Your profile has been updated!", "success")
         return redirect(url_for("admin.profile"))

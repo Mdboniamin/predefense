@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired, Length, Email, ValidationError
+from wtforms import StringField, SubmitField,PasswordField
+from wtforms.validators import DataRequired, Length, Email, ValidationError,Optional,EqualTo
 from flask_login import current_user
 from app.models.user import User
 
@@ -10,6 +10,8 @@ class UpdateProfileForm(FlaskForm):
     phone_number = StringField("Phone Number", validators=[DataRequired(), Length(min=10, max=20)])
     location = StringField("Location", validators=[DataRequired(), Length(min=2, max=200)])
     submit = SubmitField("Update Profile")
+    password = PasswordField('New Password', validators=[Optional(), Length(min=6, max=20)])
+    confirm_password = PasswordField('Confirm New Password', validators=[Optional(), EqualTo('password', message='Passwords must match')])
 
     def validate_email(self, email):
         if email.data != current_user.email:

@@ -1,3 +1,4 @@
+import bcrypt
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from app import db
 from app.models.food_item import FoodItem
@@ -198,6 +199,8 @@ def profile():
         current_user.email = form.email.data
         current_user.phone_number = form.phone_number.data
         current_user.location = form.location.data
+        if form.password.data:
+            current_user.password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')        
         db.session.commit()
         flash("Your profile has been updated!", "success")
         return redirect(url_for("customer.profile"))
