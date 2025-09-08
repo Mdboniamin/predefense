@@ -195,12 +195,20 @@ def order_history():
 def profile():
     form = UpdateProfileForm()
     if form.validate_on_submit():
+        # Check if password change is requested
+        if form.new_password.data:
+            if not bcrypt.check_password_hash(current_user.password, form.existing_password.data):
+                flash("Current password is incorrect!", "danger")
+                return redirect(url_for("customer.profile"))
+            if form.new_password.data != form.confirm_new_password.data:
+                flash("New passwords do not match!", "danger")
+                return redirect(url_for("customer.profile"))
+            current_user.password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+        
         current_user.name = form.name.data
         current_user.email = form.email.data
         current_user.phone_number = form.phone_number.data
         current_user.location = form.location.data
-        if form.password.data:
-            current_user.password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')        
         db.session.commit()
         flash("Your profile has been updated!", "success")
         return redirect(url_for("customer.profile"))
