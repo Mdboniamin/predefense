@@ -53,7 +53,8 @@ def add_food_item():
             description=form.description.data,
             price=form.price.data,
             image_url=image_url,
-            restaurant_id=current_user.id
+            restaurant_id=current_user.id,
+            category=form.category.data  # Added category
         )
         db.session.add(food_item)
         db.session.commit()
@@ -75,6 +76,7 @@ def edit_food_item(food_item_id):
         food_item.name = form.name.data
         food_item.description = form.description.data
         food_item.price = form.price.data
+        food_item.category = form.category.data  # Added category
         
         if form.image.data:
             food_item.image_url = save_picture(form.image.data)
@@ -86,6 +88,7 @@ def edit_food_item(food_item_id):
         form.name.data = food_item.name
         form.description.data = food_item.description
         form.price.data = food_item.price
+        form.category.data = food_item.category  # Added category
     
     return render_template("edit_food_item.html", title="Edit Food Item", form=form, food_item=food_item)
 
@@ -107,7 +110,7 @@ def delete_food_item(food_item_id):
 @login_required
 @restaurant_required
 def manage_orders():
-    orders = Order.query.filter_by(restaurant_id=current_user.id).all()
+    orders = Order.query.filter_by(restaurant_id=current_user.id).options(db.joinedload(Order.payment)).all()
     return render_template("manage_orders.html", orders=orders)
 
 @restaurant.route("/update_order_status/<int:order_id>/<status>", methods=["POST"])
@@ -140,11 +143,16 @@ def verify_payment(payment_id):
         flash("You can only verify payments for your own orders.", "danger")
         return redirect(url_for("restaurant.manage_orders"))
     
-    # Update payment status to verified
+    # Update payment and order status
     if payment.payment_status == 'pending':
         payment.payment_status = 'verified'
+        # Safely get the associated order
+        order = Order.query.get(payment.order_id)
+        if order and order.restaurant_id == current_user.id and order.status == 'pending':
+            order.status = 'accepted'
         db.session.commit()
-        flash(f"Payment for Order #{payment.order_id} has been verified!", "success")
+        flash(f"Payment for Order #{payment.order_id} has been verified and order accepted!", "success")
+        return redirect(url_for("restaurant.manage_orders"))
     else:
         flash("Payment is already verified or has a different status.", "warning")
         return redirect(url_for("restaurant.manage_orders"))
@@ -165,8 +173,14 @@ def update_payment_status(payment_id):
 
     if new_status in valid_payment_statuses:
         payment.payment_status = new_status
+        if new_status == 'verified':
+            order = Order.query.get(payment.order_id)
+            if order and order.restaurant_id == current_user.id and order.status == 'pending':
+                order.status = 'accepted'
         db.session.commit()
         flash(f"Payment status for Order #{payment.order_id} updated to {new_status}!", "success")
+        if new_status == 'verified':
+            flash(f"Order #{payment.order_id} has been accepted.", "success")
     else:
         flash("Invalid payment status!", "danger")
     
@@ -201,5 +215,3 @@ def profile():
         form.phone_number.data = current_user.phone_number
         form.location.data = current_user.location
     return render_template("profile.html", title="Profile", form=form)
-
-

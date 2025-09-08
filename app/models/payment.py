@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime
+from app.models.order import Order  # Ensure Order is imported
 
 class Payment(db.Model):
     __tablename__ = 'payments'
@@ -11,9 +12,9 @@ class Payment(db.Model):
     payment_phone_number = db.Column(db.String(20), nullable=False)
     payment_method = db.Column(db.Enum('bkash', name='payment_methods'), default='bkash')
     amount = db.Column(db.Numeric(10, 2), nullable=False)
-    payment_status = db.Column(db.Enum('pending', 'verified','rejected' ,'failed', name='payment_status'), default='pending' )
+    payment_status = db.Column(db.Enum('pending', 'verified', 'rejected', 'failed', name='payment_status'), default='pending')
     payment_date = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # Removed the order relationship to avoid conflict, relying on the backref from Order
     def __repr__(self):
         return f"Payment(ID: {self.id}, Transaction: {self.bkash_transaction_id}, Status: {self.payment_status})"
-

@@ -13,7 +13,6 @@ class Order(db.Model):
     payment_id = db.Column(db.Integer, db.ForeignKey('payments.id'), nullable=True)
     order_date = db.Column(db.DateTime, default=datetime.utcnow)
 
-    payment = db.relationship("Payment", backref="order", uselist=False, foreign_keys="Order.payment_id")
+    payment = db.relationship("Payment", backref="order", uselist=False, foreign_keys=[payment_id])
     def __repr__(self):
         return f"Order(ID: {self.id}, Customer: {self.customer_id}, Status: {self.status})"
-

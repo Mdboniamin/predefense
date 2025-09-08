@@ -17,7 +17,7 @@
                             <span class="input-group-text bg-white border-end-0">
                                 <i class="fas fa-search text-secondary"></i>
                             </span>
-                            <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Name or description..." aria-label="Search food items" autocomplete="off">
+                            <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Name or description or category..." aria-label="Search food items" autocomplete="off">
                         </div>
                     </div>
                     <!-- Price Filter -->
@@ -50,12 +50,33 @@
                             </select>
                         </div>
                     </div>
+                    <!-- Category Filter -->
+                    <div class="col-md-2">
+                        <label for="categoryFilter" class="form-label fw-semibold">Category</label>
+                        <div class="input-group flex-nowrap">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-list text-secondary"></i>
+                            </span>
+                            <select id="categoryFilter" class="form-select border-start-0" aria-label="Filter by category" style="min-width: 0;">
+                                <option value="">Categories</option>
+                                {% set categories = [] %}
+                                {% for food_item in food_items %}
+                                    {% if food_item.category not in categories %}
+                                        {% set _ = categories.append(food_item.category) %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% for category in categories %}
+                                    <option value="{{ category }}">{{ category }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                     <!-- Reset Button -->
-                    <div class="col-md-2 d-flex align-items-center">
+                    <!-- <div class="col-md-2 d-flex align-items-center">
                         <button id="resetFilters" type="button" class="btn btn-outline-primary w-100 rounded-3 fw-semibold py-2">
                             <i class="fas fa-undo-alt me-1"></i>Reset
                         </button>
-                    </div>
+                    </div> -->
                 </form>
             </div>
         </div>
@@ -66,6 +87,7 @@
                 <div class="food-item-card" 
                      data-name="{{ food_item.name.lower() }}" 
                      data-description="{{ food_item.description.lower() if food_item.description else '' }}"
+                     data-category="{{ food_item.category.lower() if food_item.category else '' }}"
                      data-price="{{ food_item.price }}"
                      data-restaurant="{{ food_item.restaurant_owner.name }}"
                      data-search-score="0">
@@ -78,6 +100,7 @@
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">{{ food_item.name }}</h5>
                             <p class="card-text">{{ food_item.description or "No description available" }}</p>
+                            <p class="card-text"><strong>Category: {{ food_item.category }}</strong></p>
                             <p class="card-text"><strong>Price: ${{ "%.2f"|format(food_item.price) }}</strong></p>
                             <p class="card-text mt-auto"><small class="text-muted">By: {{ food_item.restaurant_owner.name }}</small></p>
                             <a href="{{ url_for('customer.add_to_cart', food_item_id=food_item.id) }}" class="btn btn-primary btn-block mt-2">Add to Cart</a>
@@ -189,6 +212,7 @@
             const minPrice = document.getElementById('minPrice');
             const maxPrice = document.getElementById('maxPrice');
             const restaurantFilter = document.getElementById('restaurantFilter');
+            const categoryFilter = document.getElementById('categoryFilter');
             const resetFilters = document.getElementById('resetFilters');
             const foodItems = document.querySelectorAll('.food-item-card');
             const noResults = document.getElementById('noResults');
@@ -231,20 +255,23 @@
                 const minPriceFilter = parseFloat(minPrice.value) || 0;
                 const maxPriceFilter = parseFloat(maxPrice.value) || maxPriceDefault;
                 const restaurant = restaurantFilter.value;
+                const category = categoryFilter.value.toLowerCase();
 
                 let visibleItems = 0;
                 const itemsWithScores = Array.from(foodItems).map(item => {
                     const name = item.dataset.name;
                     const description = item.dataset.description;
+                    const categoryData = item.dataset.category;
                     const price = parseFloat(item.dataset.price);
                     const restaurantName = item.dataset.restaurant;
 
-                    // Calculate search score (name prioritized over description)
+                    // Calculate search score (name, description, and category prioritized)
                     const nameScore = calculateSearchScore(name, searchTerm);
                     const descScore = calculateSearchScore(description, searchTerm);
-                    const searchScore = Math.max(nameScore, descScore * 0.5); // Name matches weigh more
+                    const catScore = calculateSearchScore(categoryData, searchTerm);
+                    const searchScore = Math.max(nameScore, descScore * 0.5, catScore * 0.5); // Name matches weigh more
 
-                    return { item, searchScore, price, restaurantName };
+                    return { item, searchScore, price, restaurantName, categoryData };
                 });
 
                 // Sort by search score (descending) if search term exists
@@ -252,12 +279,13 @@
                     itemsWithScores.sort((a, b) => b.searchScore - a.searchScore);
                 }
 
-                itemsWithScores.forEach(({ item, searchScore, price, restaurantName }) => {
+                itemsWithScores.forEach(({ item, searchScore, price, restaurantName, categoryData }) => {
                     const matchesSearch = searchScore > 0;
                     const matchesPrice = price >= minPriceFilter && price <= maxPriceFilter;
                     const matchesRestaurant = !restaurant || restaurantName === restaurant;
+                    const matchesCategory = !category || categoryData === category;
 
-                    if (matchesSearch && matchesPrice && matchesRestaurant) {
+                    if (matchesSearch && matchesPrice && matchesRestaurant && matchesCategory) {
                         item.classList.remove('d-none');
                         item.dataset.searchScore = searchScore; // Store for debugging
                         visibleItems++;
@@ -278,6 +306,7 @@
             maxPrice.addEventListener('input', debouncedFilter);
             searchInput.addEventListener('input', debouncedFilter);
             restaurantFilter.addEventListener('change', debouncedFilter);
+            categoryFilter.addEventListener('change', debouncedFilter);
 
             // Reset filters
             resetFilters.addEventListener('click', function() {
@@ -285,6 +314,7 @@
                 minPrice.value = '';
                 maxPrice.value = '';
                 restaurantFilter.value = '';
+                categoryFilter.value = '';
                 filterItems(); // Immediate filter to show all items
             });
         });

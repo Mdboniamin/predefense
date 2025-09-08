@@ -8,5 +8,6 @@ class FoodItemForm(FlaskForm):
     description = TextAreaField("Description", validators=[Length(max=500)])
     price = DecimalField("Price", validators=[DataRequired(), NumberRange(min=0.01)])
     image = FileField("Food Image (Optional)", validators=[FileAllowed(["jpg", "png"])])
+    category = StringField("Category", validators=[DataRequired(), Length(min=2, max=50)])  # Added category field
     submit = SubmitField("Save Food Item")
 

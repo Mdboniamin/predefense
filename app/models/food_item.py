@@ -9,10 +9,8 @@ class FoodItem(db.Model):
     price = db.Column(db.Numeric(10, 2), nullable=False)
     image_url = db.Column(db.String(200), nullable=True)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    category = db.Column(db.String(50), nullable=False)  # Existing category field
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    orders = db.relationship('Order', backref='food_item', lazy=True)
-
+    orders = db.relationship('Order', backref='food_item', lazy=True, foreign_keys='[Order.food_item_id]')
     def __repr__(self):
         return f"FoodItem('{self.name}', '{self.price}', Restaurant ID: {self.restaurant_id})"
-

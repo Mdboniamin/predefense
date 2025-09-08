@@ -1,42 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="hero-section">
+    <div class="hero-section" style="background: #f8f9fa; padding: 60px 0; color: #333; text-align: center;">
         <div class="hero-content">
-            <h1 class="hero-title">Welcome to Food Order App</h1>
-            <p class="hero-subtitle">Order delicious food from your favorite restaurants!</p>
+            <h1 class="hero-title" style="font-size: 3rem; font-weight: bold;">Welcome to Food Order App</h1>
+            <p class="hero-subtitle" style="font-size: 1.5rem; margin-bottom: 20px;">Order delicious food from your favorite restaurants!</p>
             {% if not current_user.is_authenticated %}
-                <a class="btn btn-primary btn-lg hero-btn" href="{{ url_for('auth.register') }}" role="button">
+                <a class="btn btn-primary btn-lg hero-btn" href="{{ url_for('auth.register') }}" role="button" style="background-color: #007bff; color: #fff; border: none; padding: 10px 20px; font-weight: bold;">
                     <i class="fas fa-rocket"></i> Get Started
                 </a>
             {% endif %}
         </div>
     </div>
 
-    <div class="section-header">
-        <h2 class="section-title">
+    <div class="section-header text-center py-5">
+        <h2 class="section-title" style="color: #007bff;">
             <i class="fas fa-star"></i> Featured Food Items
         </h2>
-        <p class="section-subtitle">Discover our most popular dishes</p>
+        <p class="section-subtitle" style="color: #6c757d;">Discover our most popular dishes by category</p>
     </div>
     
-    <div class="row">
+    <div class="row justify-content-center">
         {% for food_item in food_items %}
             <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card food-item-card">
+                <div class="card food-item-card shadow-sm" style="border-radius: 15px; overflow: hidden; transition: transform 0.3s ease; border: 1px solid #dee2e6;">
                     {% if food_item.image_url %}
-                        <img class="card-img-top food-item-img" src="{{ url_for('static', filename='uploads/' + food_item.image_url) }}" alt="{{ food_item.name }}">
+                        <img class="card-img-top food-item-img" src="{{ url_for('static', filename='uploads/' + food_item.image_url) }}" alt="{{ food_item.name }}" style="height: 250px; object-fit: cover; border-bottom: 1px solid #dee2e6;">
                     {% else %}
-                        <img class="card-img-top food-item-img" src="https://via.placeholder.com/300x200?text=No+Image" alt="{{ food_item.name }}">
+                        <img class="card-img-top food-item-img" src="https://via.placeholder.com/300x250?text=No+Image" alt="{{ food_item.name }}" style="height: 250px; object-fit: cover; border-bottom: 1px solid #dee2e6;">
                     {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ food_item.name }}</h5>
-                        <p class="card-text">{{ food_item.description or "No description available" }}</p>
-                        <div class="price-section">
-                            <span class="price">${{ food_item.price }}</span>
-                            <span class="restaurant-name">{{ food_item.restaurant_owner.name }}</span>
+                    <div class="card-body text-center p-4">
+                        <h5 class="card-title" style="font-size: 1.3rem; font-weight: bold; color: #333; margin-bottom: 10px;">{{ food_item.name }}</h5>
+                        <p class="card-text" style="color: #6c757d; margin-bottom: 10px;">{{ food_item.description or "No description available" }}</p>
+                        <p class="card-text" style="font-style: italic; color: #6c757d; margin-bottom: 15px;">Category: {{ food_item.category }}</p>
+                        <div class="price-section d-flex justify-content-between align-items-center mb-3">
+                            <span class="price" style="font-size: 1.2rem; color: #28a745;">${{ food_item.price }}</span>
+                            <span class="restaurant-name" style="color: #6c757d;">by {{ food_item.restaurant_owner.name }}</span>
                         </div>
                         {% if current_user.is_authenticated and current_user.role == "customer" %}
-                            <a href="{{ url_for('customer.add_to_cart', food_item_id=food_item.id) }}" class="btn btn-primary btn-block">
+                            <a href="{{ url_for('customer.add_to_cart', food_item_id=food_item.id) }}" class="btn btn-primary btn-block" style="background-color: #007bff; border: none; padding: 10px;">
                                 <i class="fas fa-cart-plus"></i> Add to Cart
                             </a>
                         {% endif %}
@@ -47,13 +48,12 @@
     </div>
 
     {% if not food_items %}
-        <div class="empty-state">
-            <div class="empty-state-icon">
+        <div class="empty-state text-center py-5">
+            <div class="empty-state-icon" style="font-size: 4rem; color: #6c757d;">
                 <i class="fas fa-utensils"></i>
             </div>
-            <h4 class="empty-state-title">No food items available yet!</h4>
-            <p class="empty-state-text">Check back later for delicious food options.</p>
+            <h4 class="empty-state-title" style="color: #333; font-size: 1.5rem;">No food items available yet!</h4>
+            <p class="empty-state-text" style="color: #6c757d;">Check back later for delicious food options.</p>
         </div>
     {% endif %}
 {% endblock content %}
-

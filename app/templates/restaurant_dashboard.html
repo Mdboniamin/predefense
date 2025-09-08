@@ -14,6 +14,7 @@
                             <thead>
                                 <tr>
                                     <th>Name</th>
+                                    <th>Category</th>
                                     <th>Price</th>
                                     <th>Actions</th>
                                 </tr>
@@ -22,6 +23,7 @@
                                 {% for food_item in food_items %}
                                     <tr>
                                         <td>{{ food_item.name }}</td>
+                                        <td>{{ food_item.category }}</td>
                                         <td>${{ food_item.price }}</td>
                                         <td>
                                             <a href="{{ url_for('restaurant.edit_food_item', food_item_id=food_item.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
@@ -75,4 +77,3 @@
         </div>
     </div>
 {% endblock content %}
-
