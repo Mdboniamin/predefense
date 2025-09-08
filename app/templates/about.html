@@ -56,11 +56,10 @@
         </div>
     </div>
 
-    <div class="section-header">
-        <h2 class="section-title"><i class="fas fa-shield-alt"></i> Secure Transactions</h2>
-        <p class="section-subtitle">Our system uses manual bKash payment verification to ensure safe and reliable transactions.</p>
-    </div>
-
+<div class="section-header">
+    <h2 class="section-title"><i class="fas fa-shield-alt"></i> Secure Transactions</h2>
+    <p class="section-subtitle">Our system uses manual bKash payment verification to ensure safe and reliable transactions.</p>
+</div>
     <div class="text-center mb-4">
         {% if not current_user.is_authenticated %}
             <a class="btn btn-primary btn-lg hero-btn" href="{{ url_for('auth.register') }}" role="button">

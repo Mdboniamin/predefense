@@ -37,13 +37,14 @@
               {% endif %}
             </div>
             <!-- Navbar Right Side -->
+            <!-- Desktop Navbar -->
             <div class="navbar-nav">
               {% if current_user.is_authenticated %}
-                <a class="nav-item nav-link" href="{{ url_for("customer.profile") }}">Profile</a>
-                <a class="nav-item nav-link" href="{{ url_for("auth.logout") }}">Logout</a>
+                <a class="nav-item nav-link" href="{{ url_for(current_user.role + '.profile') }}">Profile</a>
+                <a class="nav-item nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
               {% else %}
-                <a class="nav-item nav-link" href="{{ url_for("auth.login") }}">Login</a>
-                <a class="nav-item nav-link" href="{{ url_for("auth.register") }}">Register</a>
+                <a class="nav-item nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                <a class="nav-item nav-link" href="{{ url_for('auth.register') }}">Register</a>
               {% endif %}
             </div>
           </div>
@@ -67,68 +68,68 @@
       </div>
     </main>
 
-    <!-- Mobile Bottom Navigation Bar -->
-    <nav class="navbar fixed-bottom navbar-light bg-light d-md-none"> <!-- Show only on mobile -->
-        <div class="container-fluid">
-            <div class="row w-100">
-                <div class="col text-center">
-                    <a class="nav-link" href="{{ url_for("main.home") }}"><i class="fas fa-home"></i><br>Home</a>
-                </div>
-                {% if current_user.is_authenticated %}
-                    {% if current_user.role == "customer" %}
-                        <div class="col text-center">
-                            <a class="nav-link" href="{{ url_for("customer.browse") }}"><i class="fas fa-utensils"></i><br>Browse</a>
-                        </div>
-                        <div class="col text-center">
-                            <a class="nav-link" href="{{ url_for("customer.view_cart") }}"><i class="fas fa-shopping-cart"></i><br>Cart</a>
-                        </div>
-                        <div class="col text-center">
-                            <a class="nav-link" href="{{ url_for("customer.order_history") }}"><i class="fas fa-history"></i><br>Orders</a>
-                        </div>
-                        <div class="col text-center">
-                            <a class="nav-link" href="{{ url_for("customer.profile") }}"><i class="fas fa-user"></i><br>Profile</a>
-                        </div>
-                    {% elif current_user.role == "restaurant" %}
-                        <div class="col text-center">
-                            <a class="nav-link" href="{{ url_for("restaurant.dashboard") }}"><i class="fas fa-tachometer-alt"></i><br>Dashboard</a>
-                        </div>
-                        <div class="col text-center">
-                            <a class="nav-link" href="{{ url_for("restaurant.add_food_item") }}"><i class="fas fa-plus-circle"></i><br>Add Item</a>
-                        </div>
-                        <div class="col text-center">
-                            <a class="nav-link" href="{{ url_for("restaurant.manage_orders") }}"><i class="fas fa-clipboard-list"></i><br>Orders</a>
-                        </div>
-                        <div class="col text-center">
-                            <a class="nav-link" href="{{ url_for("customer.profile") }}"><i class="fas fa-user"></i><br>Profile</a>
-                        </div>
-                    {% elif current_user.role == "admin" %}
-                        <div class="col text-center">
-                            <a class="nav-link" href="{{ url_for("admin.dashboard") }}"><i class="fas fa-user-shield"></i><br>Admin</a>
-                        </div>
-                        <div class="col text-center">
-                            <a class="nav-link" href="{{ url_for("admin.manage_users") }}"><i class="fas fa-users"></i><br>Users</a>
-                        </div>
-                        <div class="col text-center">
-                            <a class="nav-link" href="{{ url_for("admin.manage_payments") }}"><i class="fas fa-money-check-alt"></i><br>Payments</a>
-                        </div>
-                        <div class="col text-center">
-                            <a class="nav-link" href="{{ url_for("customer.profile") }}"><i class="fas fa-user"></i><br>Profile</a>
-                        </div>
-                    {% endif %}
-                    <div class="col text-center">
-                        <a class="nav-link" href="{{ url_for("auth.logout") }}"><i class="fas fa-sign-out-alt"></i><br>Logout</a>
-                    </div>
-                {% else %}
-                    <div class="col text-center">
-                        <a class="nav-link" href="{{ url_for("auth.login") }}"><i class="fas fa-sign-in-alt"></i><br>Login</a>
-                    </div>
-                    <div class="col text-center">
-                        <a class="nav-link" href="{{ url_for("auth.register") }}"><i class="fas fa-user-plus"></i><br>Register</a>
-                    </div>
-                {% endif %}
-            </div>
+<!-- Mobile Bottom Navigation Bar -->
+<nav class="navbar fixed-bottom navbar-light bg-light d-md-none">
+  <div class="container-fluid">
+    <div class="row w-100">
+      <div class="col text-center">
+        <a class="nav-link" href="{{ url_for('main.home') }}"><i class="fas fa-home"></i><br>Home</a>
+      </div>
+      {% if current_user.is_authenticated %}
+        {% if current_user.role == "customer" %}
+          <div class="col text-center">
+            <a class="nav-link" href="{{ url_for('customer.browse') }}"><i class="fas fa-utensils"></i><br>Browse</a>
+          </div>
+          <div class="col text-center">
+            <a class="nav-link" href="{{ url_for('customer.view_cart') }}"><i class="fas fa-shopping-cart"></i><br>Cart</a>
+          </div>
+          <div class="col text-center">
+            <a class="nav-link" href="{{ url_for('customer.order_history') }}"><i class="fas fa-history"></i><br>Orders</a>
+          </div>
+          <div class="col text-center">
+            <a class="nav-link" href="{{ url_for('customer.profile') }}"><i class="fas fa-user"></i><br>Profile</a>
+          </div>
+        {% elif current_user.role == "restaurant" %}
+          <div class="col text-center">
+            <a class="nav-link" href="{{ url_for('restaurant.dashboard') }}"><i class="fas fa-tachometer-alt"></i><br>Dashboard</a>
+          </div>
+          <div class="col text-center">
+            <a class="nav-link" href="{{ url_for('restaurant.add_food_item') }}"><i class="fas fa-plus-circle"></i><br>Add Item</a>
+          </div>
+          <div class="col text-center">
+            <a class="nav-link" href="{{ url_for('restaurant.manage_orders') }}"><i class="fas fa-clipboard-list"></i><br>Orders</a>
+          </div>
+          <div class="col text-center">
+            <a class="nav-link" href="{{ url_for('restaurant.profile') }}"><i class="fas fa-user"></i><br>Profile</a>
+          </div>
+        {% elif current_user.role == "admin" %}
+          <div class="col text-center">
+            <a class="nav-link" href="{{ url_for('admin.dashboard') }}"><i class="fas fa-user-shield"></i><br>Admin</a>
+          </div>
+          <div class="col text-center">
+            <a class="nav-link" href="{{ url_for('admin.manage_users') }}"><i class="fas fa-users"></i><br>Users</a>
+          </div>
+          <div class="col text-center">
+            <a class="nav-link" href="{{ url_for('admin.manage_payments') }}"><i class="fas fa-money-check-alt"></i><br>Payments</a>
+          </div>
+          <div class="col text-center">
+            <a class="nav-link" href="{{ url_for('admin.profile') }}"><i class="fas fa-user"></i><br>Profile</a>
+          </div>
+        {% endif %}
+        <div class="col text-center">
+          <a class="nav-link" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i><br>Logout</a>
         </div>
-    </nav>
+      {% else %}
+        <div class="col text-center">
+          <a class="nav-link" href="{{ url_for('auth.login') }}"><i class="fas fa-sign-in-alt"></i><br>Login</a>
+        </div>
+        <div class="col text-center">
+          <a class="nav-link" href="{{ url_for('auth.register') }}"><i class="fas fa-user-plus"></i><br>Register</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</nav>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
